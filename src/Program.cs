@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace RemoveMfcComments
+namespace ConvertCppInclude
 {
     internal static class Program
     {
@@ -18,22 +18,22 @@ namespace RemoveMfcComments
 
             try
             {
-                const int DirectoryIndex = 0;
-                const int PatternIndex = 1;
+                const int directoryIndex = 0;
+                const int patternIndex = 1;
 
-                string[] filenames = Directory.GetFiles(args[DirectoryIndex], args[PatternIndex], SearchOption.AllDirectories);
-                Console.WriteLine("Found {0} files with pattern {1} in directory {2} ", filenames.Length, args[PatternIndex], args[DirectoryIndex]);
-                int updateCount = 0;
+                string[] filenames = Directory.GetFiles(args[directoryIndex], args[patternIndex], SearchOption.AllDirectories);
+                Console.WriteLine("Found {0} files with pattern {1} in directory {2} ", filenames.Length, args[patternIndex], args[directoryIndex]);
+                int convertCount = 0;
 
                 foreach (string inputFilename in filenames)
                 {
-                    string outputFilename = inputFilename + ".stripped";
+                    string outputFilename = inputFilename + ".converted";
                     bool linesStripped = ReadAndConvert(inputFilename, outputFilename);
                     if (linesStripped)
                     {
                         File.Delete(inputFilename);
                         File.Move(outputFilename, inputFilename);
-                        updateCount++;
+                        convertCount++;
                     }
                     else
                     {
@@ -41,7 +41,7 @@ namespace RemoveMfcComments
                     }
                 }
 
-                Console.WriteLine("Processed {0} files", updateCount);
+                Console.WriteLine("Converted {0} files", convertCount);
             }
             catch (IOException e)
             {
@@ -80,23 +80,32 @@ namespace RemoveMfcComments
             convertedLine = null;
             line = line.Trim();
 
-            if (line.Contains("#include") && line.Contains("\""))
+            if (!line.Contains("#include") || !line.Contains("\""))
             {
-                int start = line.IndexOf('"');
-                int end = line.LastIndexOf('"');
-                int length = end - start;
-                if (start >= 0 && end >= 0 && end > start)
-                {
-                    string filename = line.Substring(start, length);
-                    string path = Path.Combine(baseDirectory, filename);
-                    if (!File.Exists(path))
-                    {
-                        convertedLine = "#include <" + filename + ">";
-                    }
-                }
+                return false;
             }
 
-            return false;
+            int start = line.IndexOf('"');
+            int end = line.LastIndexOf('"');
+            int length = end - (start + 1);
+            if (start < 0 || end < 0 || end <= start)
+            {
+                return false;
+            }
+
+            string filename = line.Substring(start + 1, length);
+            string path = Path.Combine(baseDirectory, filename);
+            if (File.Exists(path))
+            {
+                return false;
+            }
+
+            var sb = new StringBuilder(line)
+            {
+                [start] = '<', [end] = '>'
+            };
+            convertedLine = sb.ToString();
+            return true;
         }
     }
 }
