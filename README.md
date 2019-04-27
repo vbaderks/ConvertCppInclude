@@ -1,8 +1,8 @@
-﻿# Remove MFC Comments
+﻿# Convert C++ #include "" to <>
 
 ## Introduction
 
-ConvertCppInclude is a small C# tool to convert #include "global-file" recursively to #include \<global-file>
+ConvertCppInclude is a small C# tool to convert C++ #include "header.h" statements recursively to #include \<header.h>
 
 The C++ standard is a little fuzzy about the difference between #include "" and #include \<>. But in essence
 \#include "" will look first in the same directory as the file that contains the #include statement.
