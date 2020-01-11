@@ -53,15 +53,15 @@ namespace ConvertCppInclude
         private static bool ReadAndConvert(string inputPath, string outputPath)
         {
             bool lineConverted = false;
-            string baseDirectory = Path.GetDirectoryName(inputPath);
+            string baseDirectory = GetBaseDirectory(inputPath);
 
             using (var input = new StreamReader(inputPath, Encoding.GetEncoding("Windows-1252"), true))
             using (var output = new StreamWriter(outputPath, false, Encoding.UTF8))
             {
-                string line;
+                string? line;
                 while ((line = input.ReadLine()) != null)
                 {
-                    if (IsConvertNeeded(baseDirectory, line, out string convertedLine))
+                    if (IsConvertNeeded(baseDirectory, line, out string? convertedLine))
                     {
                         lineConverted = true;
                         output.WriteLine(convertedLine);
@@ -76,7 +76,7 @@ namespace ConvertCppInclude
             return lineConverted;
         }
 
-        private static bool IsConvertNeeded(string baseDirectory, string line, out string convertedLine)
+        private static bool IsConvertNeeded(string baseDirectory, string line, out string? convertedLine)
         {
             convertedLine = null;
             line = line.Trim();
@@ -107,6 +107,17 @@ namespace ConvertCppInclude
             };
             convertedLine = sb.ToString();
             return true;
+        }
+
+        private static string GetBaseDirectory(string inputPath)
+        {
+            string? baseDirectory = Path.GetDirectoryName(inputPath);
+            if (baseDirectory == null)
+            {
+                throw new IOException("Unable to get the directory name");
+            }
+
+            return baseDirectory;
         }
     }
 }

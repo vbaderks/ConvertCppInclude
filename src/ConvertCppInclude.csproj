@@ -6,6 +6,9 @@
     <Authors>Victor Derks</Authors>
     <Company />
     <CodeAnalysisRuleSet>CodeAnalysisRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <Nullable>enable</Nullable>    
   </PropertyGroup>
 
   <ItemGroup>
