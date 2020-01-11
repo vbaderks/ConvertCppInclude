@@ -1,3 +1,6 @@
+# Copyright (c) Victor Derks.
+# SPDX-License-Identifier: MIT
+
 # top-most EditorConfig file
 root = true
 
