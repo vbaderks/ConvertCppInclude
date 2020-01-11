@@ -81,12 +81,12 @@ namespace ConvertCppInclude
             convertedLine = null;
             line = line.Trim();
 
-            if (!line.Contains("#include") || !line.Contains("\""))
+            if (!line.Contains("#include", StringComparison.Ordinal) || !line.Contains("\"", StringComparison.Ordinal))
             {
                 return false;
             }
 
-            int start = line.IndexOf('"');
+            int start = line.IndexOf('"', StringComparison.Ordinal);
             int end = line.LastIndexOf('"');
             int length = end - (start + 1);
             if (start < 0 || end < 0 || end <= start)
