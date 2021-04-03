@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Text;
 
+[assembly: CLSCompliant(true)]
+
 namespace ConvertCppInclude
 {
     internal static class Program
@@ -55,21 +57,19 @@ namespace ConvertCppInclude
             bool lineConverted = false;
             string baseDirectory = GetBaseDirectory(inputPath);
 
-            using (var input = new StreamReader(inputPath, Encoding.GetEncoding("Windows-1252"), true))
-            using (var output = new StreamWriter(outputPath, false, Encoding.UTF8))
+            using var input = new StreamReader(inputPath, Encoding.GetEncoding("Windows-1252"), true);
+            using var output = new StreamWriter(outputPath, false, Encoding.UTF8);
+            string? line;
+            while ((line = input.ReadLine()) != null)
             {
-                string? line;
-                while ((line = input.ReadLine()) != null)
+                if (IsConvertNeeded(baseDirectory, line, out string? convertedLine))
                 {
-                    if (IsConvertNeeded(baseDirectory, line, out string? convertedLine))
-                    {
-                        lineConverted = true;
-                        output.WriteLine(convertedLine);
-                    }
-                    else
-                    {
-                        output.WriteLine(line);
-                    }
+                    lineConverted = true;
+                    output.WriteLine(convertedLine);
+                }
+                else
+                {
+                    output.WriteLine(line);
                 }
             }
 
